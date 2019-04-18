@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {AppRegistry, StatusBar, Text, View, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'
 import { fetchWeather } from './weather-api'
+import Highlight from 'react-native-highlight-words'
 
 const iconNames = {
 	Default: 'md-time',
@@ -90,7 +91,7 @@ class App extends Component {
   getLocation() {
     navigator.geolocation.getCurrentPosition(
       (posData) => fetchWeather(posData.coords.latitude,posData.coords.longitude)
-      .then(res => this.setState({temp: res.temp, weather: res.weather})),
+      .then(res => this.setState({temp: Math.round(res.temp), weather: res.weather})),
       (error) => console.log(error),
       {timeout: 10000}
     )
@@ -98,16 +99,18 @@ class App extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, {backgroundColor: phrases[this.state.weather].background}]}>
         <View style={styles.header}>
           <Icon name={iconNames[this.state.weather]} size={70} color={'white'}/>
-          <Text style={styles.temp}>{this.state.temp}</Text>
+          <Text style={styles.temp}>{this.state.temp}°</Text>
         </View>
         <View style={styles.body}>
-          <Text style={styles.title}>build a 
-            <Text style={{color: 'red'}}> fucking</Text> 
-          weather app.</Text>
-          <Text style={styles.subtitle}>Let's make it rain!</Text>
+            <Highlight 
+            style={styles.title}
+            highlightStyle={{color: phrases[this.state.weather].color}} 
+            searchWords={[phrases[this.state.weather].highlight]}
+            textToHighlight={phrases[this.state.weather].title}/>
+          <Text style={styles.subtitle}>{phrases[this.state.weather].subtitle}</Text>
         </View>
       </View>
     );
